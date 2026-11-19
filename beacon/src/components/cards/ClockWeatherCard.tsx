@@ -43,11 +43,17 @@ export function ClockWeatherCard({ context }: DashboardCardProps) {
           >
             ›
           </button>
-          {!isViewingToday && (
-            <button type="button" className="dash-day-nav-today" onClick={goToToday}>
-              {t('common.today')}
-            </button>
-          )}
+          <button
+            type="button"
+            className="dash-day-nav-today"
+            onClick={goToToday}
+            disabled={isViewingToday}
+            aria-hidden={isViewingToday}
+            tabIndex={isViewingToday ? -1 : undefined}
+            style={{ visibility: isViewingToday ? 'hidden' : 'visible' }}
+          >
+            {t('common.today')}
+          </button>
         </div>
       </div>
       {weather && (

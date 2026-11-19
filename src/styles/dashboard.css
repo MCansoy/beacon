@@ -117,7 +117,9 @@
 
 .dash-topbar-left {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
   gap: 16px;
 }
 
@@ -136,14 +138,27 @@
 }
 
 .dash-topbar-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 2.7em;
+  line-height: 1.35;
+  text-align: center;
+  overflow-wrap: anywhere;
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 400;
   color: var(--text-secondary);
 }
 
+/* Reserve the date and Today slots so neither arrow moves as labels change.
+   Narrow screens wrap the full date within its slot instead of truncating it. */
 .dash-topbar-date-nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 28px max-content;
+  width: 30rem;
+  max-width: 100%;
   align-items: center;
   gap: 10px;
 }
