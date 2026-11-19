@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { CalendarEvent, CalendarInfo, CalendarColorMember, resolveCalendarColor } from '../types';
 import { haFetch, hasToken, callBeaconAction, BeaconActionError } from '../api/ha-rest';
 import { HomeAssistantClient, toWsEventPayload } from '../api/homeassistant';
@@ -44,6 +44,12 @@ export function useCalendarEvents(
   const [calendars, setCalendars] = useState<CalendarInfo[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
+  const requestIdRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => {
+    ++requestIdRef.current;
+    abortRef.current?.abort();
+  }, [connected]);
   const calendarsRef = useRef<CalendarInfo[]>([]);
   const colorOptionsRef = useRef(colorOptions);
   colorOptionsRef.current = colorOptions;
@@ -70,19 +76,27 @@ export function useCalendarEvents(
   const fetchEvents = useCallback(async (start: string, end: string) => {
     if (!connected && !hasToken()) return;
 
+    const requestId = ++requestIdRef.current;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     setLoading(true);
     try {
       let cals = calendarsRef.current;
       if (cals.length === 0) {
         cals = (await fetchCalendars()) || [];
       }
-      if (cals.length === 0) return;
+      if (requestId !== requestIdRef.current) return;
+      if (cals.length === 0) {
+        setEvents([]);
+        return;
+      }
 
-      const allEvents: CalendarEvent[] = [];
-      for (const cal of cals) {
+      const groups = await Promise.all(cals.map(async (cal) => {
+        const calendarEvents: CalendarEvent[] = [];
         try {
           const params = new URLSearchParams({ start, end });
-          const result = await haFetch(`/api/calendars/${cal.id}?${params}`) as Array<{
+          const result = await haFetch(`/api/calendars/${cal.id}?${params}`, { signal: controller.signal }) as Array<{
             uid?: string;
             summary: string;
             start: string | { dateTime: string; date: string };
@@ -106,8 +120,8 @@ export function useCalendarEvents(
             // real uid) can be blocked with a clear error instead of
             // silently no-op'ing server-side.
             const realUid = ev.uid || ev.recurrence_id;
-            allEvents.push({
-              id: realUid || `${cal.id}-${allEvents.length}`,
+            calendarEvents.push({
+              id: realUid || `${cal.id}-${calendarEvents.length}`,
               title: ev.summary,
               start: startStr,
               end: endStr,
@@ -121,14 +135,18 @@ export function useCalendarEvents(
             });
           }
         } catch (err) {
-          console.error(`Failed to fetch events for ${cal.name}:`, err);
+          if (!controller.signal.aborted) console.error(`Failed to fetch events for ${cal.name}:`, err);
         }
-      }
+        return calendarEvents;
+      }));
 
+      // Aborting is best-effort; a completed older response must never win.
+      if (requestId !== requestIdRef.current) return;
+      const allEvents = groups.flat();
       allEvents.sort((a, b) => a.start.localeCompare(b.start));
       setEvents(allEvents);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   }, [connected, fetchCalendars]);
 
