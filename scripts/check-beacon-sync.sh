@@ -20,7 +20,7 @@ if ! diff -r src/ beacon/src/ --brief; then
 fi
 
 # Check that required files are synced
-for file in Dockerfile run.sh CHANGELOG.md; do
+for file in Dockerfile run.sh CHANGELOG.md server.js media-source.cjs; do
   if ! diff "$file" "beacon/$file" > /dev/null 2>&1; then
     echo "❌ ERROR: beacon/$file is out of sync with root"
     echo "Run: cp $file beacon/"

@@ -12,6 +12,7 @@ const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
 const WebSocket = require('ws');
+const { createMediaSourceHandler } = require('./media-source.cjs');
 
 const PORT = 3000;
 const DIST = process.env.BEACON_DIST || '/app/dist';
@@ -698,7 +699,15 @@ function handleVoiceAction(req, res) {
   });
 }
 
+const handleMediaSource = createMediaSourceHandler(haWsCommand);
 const server = http.createServer((req, res) => {
+  // Beacon-owned HTTP facade for HA's WebSocket-only media commands.
+  // Must precede the generic /api/ proxy.
+  if (req.url.startsWith('/api/media_source/')) {
+    void handleMediaSource(req, res);
+    return;
+  }
+
   // Voice / natural-language action API
   if (req.url === '/beacon-action/voice') {
     handleVoiceAction(req, res);

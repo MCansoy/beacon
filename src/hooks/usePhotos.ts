@@ -24,18 +24,27 @@ export function usePhotos(
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const preloadRef = useRef<HTMLImageElement | null>(null);
 
-  // Load photos on mount
+  // Refresh before signed URLs expire and discover newly uploaded photos.
   useEffect(() => {
     let cancelled = false;
 
-    getPhotos(sources).then((result) => {
-      if (!cancelled) {
-        setPhotos(result);
-        setCurrentIndex(0);
+    let refreshTimer: ReturnType<typeof setTimeout>;
+    const refresh = async () => {
+      try {
+        const result = await getPhotos(sources);
+        if (!cancelled) {
+          setPhotos(result);
+          setCurrentIndex((index) => result.length ? index % result.length : 0);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        // Schedule after completion so slow HA requests cannot pile up.
+        if (!cancelled) refreshTimer = setTimeout(refresh, 60_000);
       }
-    }).catch(console.error);
-
-    return () => { cancelled = true; };
+    };
+    void refresh();
+    return () => { cancelled = true; clearTimeout(refreshTimer); };
   }, [sources.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Preload the next photo for smooth transitions

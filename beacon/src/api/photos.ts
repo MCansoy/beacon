@@ -2,8 +2,6 @@ import { Photo } from '../types/photos';
 import { getConfig } from '../config';
 import { haFetch, hasToken } from './ha-rest';
 
-const { photo_directory: PHOTOS_PATH } = getConfig();
-
 /**
  * Shuffles an array in place using Fisher-Yates.
  */
@@ -21,7 +19,8 @@ function shuffle<T>(arr: T[]): T[] {
  * media root IS /media, so the id is everything after that prefix.
  */
 function toMediaSourceId(path: string): string {
-  const relative = path.replace(/^\/?media\/?/, '').replace(/\/$/, '');
+  if (path.startsWith('media-source://')) return path;
+  const relative = path.replace(/^\/?media(?:\/|$)/, '').replace(/^\/+|\/+$/g, '');
   return relative
     ? `media-source://media_source/local/${relative}`
     : 'media-source://media_source/local';
@@ -43,9 +42,9 @@ interface ResolveMediaResponse {
 }
 
 /**
- * Resolves a media_content_id to a signed, playable URL via HA's
- * resolve_media endpoint — the hand-built /api/media_source/local/<id> URL
- * used previously isn't a real HA endpoint.
+ * Resolves a media_content_id through Beacon's HTTP-to-WebSocket bridge.
+ * HA itself has no browse_media/resolve_media HTTP endpoints. The bridge
+ * signs local URLs for use in an <img> without an Authorization header.
  */
 async function resolvePhotoUrl(mediaContentId: string): Promise<string | null> {
   try {
@@ -100,7 +99,7 @@ async function fetchHAMediaPhotos(): Promise<Photo[]> {
  * media source (converted from the filesystem-style photo_directory path).
  */
 async function fetchLocalPhotos(): Promise<Photo[]> {
-  return browseAndResolvePhotos(toMediaSourceId(PHOTOS_PATH), 'local');
+  return browseAndResolvePhotos(toMediaSourceId(getConfig().photo_directory), 'local');
 }
 
 /**
