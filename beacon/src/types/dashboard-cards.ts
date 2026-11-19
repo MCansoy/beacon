@@ -123,6 +123,8 @@ export interface CardDefinition {
   component: DashboardCardComponent;
   defaultConfig: Record<string, unknown>;
   defaultSize: CardSize;
+  /** Optional initial grid dimensions for cards with more substantial content. */
+  defaultGridSize?: Partial<Record<DashboardRegion, Pick<GridPosition, 'w' | 'h'>>>;
   /** Declarative fields rendered by the shared card configuration modal. */
   configFields?: CardConfigField[];
   /** Regions this card type can be placed/added into via the card picker. */

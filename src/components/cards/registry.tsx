@@ -1,4 +1,5 @@
 import { CardDefinition } from '../../types/dashboard-cards';
+import { ClockForecastCard } from './ClockForecastCard';
 import { ClockWeatherCard } from './ClockWeatherCard';
 import { FamilyCalendarCard } from './FamilyCalendarCard';
 import { AgendaTodayCard } from './AgendaTodayCard';
@@ -18,6 +19,20 @@ export const cardRegistry: Record<string, CardDefinition> = {
     component: ClockWeatherCard,
     defaultConfig: {},
     defaultSize: 'lg',
+    allowedRegions: ['topbar', 'main', 'sidebar'],
+  },
+  'clock-forecast': {
+    type: 'clock-forecast',
+    displayNameKey: 'cards.clockForecast.displayName',
+    icon: '🌤️',
+    component: ClockForecastCard,
+    defaultGridSize: { topbar: { w: 24, h: 9 } },
+    defaultConfig: { title: '', entity_id: '' },
+    defaultSize: 'lg',
+    configFields: [
+      { type: 'text', key: 'title', labelKey: 'cards.common.titleLabel' },
+      { type: 'entity', key: 'entity_id', labelKey: 'cards.common.entityLabel' },
+    ],
     allowedRegions: ['topbar', 'main', 'sidebar'],
   },
   'family-calendar': {

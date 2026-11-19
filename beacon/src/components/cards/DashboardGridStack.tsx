@@ -31,7 +31,9 @@ function cellHeightFor(height: number, rows: number): number {
 }
 
 /** Width/height (in grid units) to seed a newly added card with, based on its registry default size. */
-function defaultSpanFor(region: DashboardRegion, size: DashboardCard['size']): { w: number; h: number } {
+function defaultSpanFor(region: DashboardRegion, size: DashboardCard['size'], type: string): { w: number; h: number } {
+  const custom = cardRegistry[type]?.defaultGridSize?.[region];
+  if (custom) return custom;
   if (region === 'topbar') return { w: 12, h: 2 };
   if (region === 'sidebar') return { w: SIDEBAR_GRID_COLUMNS, h: size === 'sm' ? 3 : 5 };
   if (size === 'sm') return { w: 6, h: 4 };
@@ -177,8 +179,8 @@ export function DashboardGridStack({ region, cards, context, editMode, onChange 
         id: c.id,
         x: c.layout?.x,
         y: c.layout?.y,
-        w: sizeHint?.w ?? c.layout?.w ?? defaultSpanFor(region, c.size).w ?? DEFAULT_W,
-        h: sizeHint?.h ?? c.layout?.h ?? defaultSpanFor(region, c.size).h ?? DEFAULT_H,
+        w: sizeHint?.w ?? c.layout?.w ?? defaultSpanFor(region, c.size, c.type).w ?? DEFAULT_W,
+        h: sizeHint?.h ?? c.layout?.h ?? defaultSpanFor(region, c.size, c.type).h ?? DEFAULT_H,
         autoPosition: !c.layout,
       };
       grid.makeWidget(el, widget);
@@ -198,7 +200,7 @@ export function DashboardGridStack({ region, cards, context, editMode, onChange 
       size: definition.defaultSize,
       config: { ...definition.defaultConfig },
     };
-    pendingSizeRef.current.set(newCard.id, defaultSpanFor(region, definition.defaultSize));
+    pendingSizeRef.current.set(newCard.id, defaultSpanFor(region, definition.defaultSize, definition.type));
     onChange([...cardsRef.current, newCard]);
     setPickerOpen(false);
   };
