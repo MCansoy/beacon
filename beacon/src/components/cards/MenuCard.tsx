@@ -25,7 +25,7 @@ export function MenuCard({ context }: DashboardCardProps) {
             <span className="dash-menu-icon">{MEAL_ICONS[meal.meal_type] || '🍽️'}</span>
             <div className="dash-menu-info">
               <span className="dash-menu-type">{meal.meal_type}</span>
-              <span className="dash-menu-name">{meal.name}</span>
+              {meal.recipe_id && context.onRecipeClick ? <button className="dash-menu-recipe" onClick={() => context.onRecipeClick?.(meal.recipe_id!)}>{meal.name}</button> : <span className="dash-menu-name">{meal.name}</span>}
             </div>
           </li>
         ))}

@@ -26,6 +26,7 @@ import { GroceryView } from './components/GroceryView';
 import { OmniAdd } from './components/OmniAdd';
 import { CalendarSidebar } from './components/CalendarSidebar';
 import { Timer } from './components/Timer';
+import { RecipesView } from './components/RecipesView';
 import { WeatherView } from './components/WeatherView';
 import { useIngressDetect } from './hooks/useIngressDetect';
 import { useHaAuth } from './hooks/useHaAuth';
@@ -42,6 +43,7 @@ import { I18nContext, createI18n } from './i18n';
 const config = getConfig();
 
 export function App() {
+  const [recipeId, setRecipeId] = useState<string | null>(null);
   const auth = useHaAuth();
   const { client, connected } = useHomeAssistant();
   const { isIngress, compact } = useIngressDetect();
@@ -588,7 +590,7 @@ export function App() {
       {!settings.kioskMode && (
         <Sidebar
           activeView={activeView}
-          onChangeView={handleChangeView}
+          onChangeView={(view) => { if (view === 'recipes') setRecipeId(null); handleChangeView(view); }}
           position={sidebarPos}
         />
       )}
@@ -606,6 +608,7 @@ export function App() {
               todoItems={dashboardTasks.items}
               onToggleTodo={dashboardTasks.toggleItem}
               onWeatherClick={() => setActiveView('weather')}
+              onRecipeClick={(id) => { setRecipeId(id); setActiveView('recipes'); }}
               onEventClick={handleEventClick}
               members={members}
               taskmateUsers={dashboardTasks.users}
@@ -660,6 +663,8 @@ export function App() {
             calendars={calendars}
             onEnterFocusMode={handleEnterFocusMode}
           />
+        ) : activeView === 'recipes' ? (
+          <RecipesView initialRecipeId={recipeId} />
         ) : activeView === 'grocery' ? (
           <GroceryView defaultListId={settings.defaultGroceryList || undefined} mode="grocery" groceryListIds={settings.groceryListIds} />
         ) : activeView === 'tasks' ? (

@@ -20,6 +20,7 @@ export const pt: Record<TranslationKey, string> = {
   'common.start': 'Iniciar',
 
   // ---- nav (Sidebar) ----
+  'nav.recipes': 'Receitas',
   'nav.dashboard': 'Painel',
   'nav.calendar': 'Calendário',
   'nav.chores': 'Tarefas',

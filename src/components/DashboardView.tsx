@@ -29,6 +29,7 @@ interface DashboardViewProps {
   onToggleChore: (choreId: string) => void;
   todoItems?: TodoItem[];
   onToggleTodo?: (uid: string, currentStatus: string, listId?: string) => void;
+  onRecipeClick?: (id: string) => void;
   onWeatherClick?: () => void;
   onEventClick?: (event: CalendarEvent) => void;
   members?: FamilyMember[];
@@ -55,6 +56,7 @@ export function DashboardView({
   onToggleChore,
   todoItems = [],
   onToggleTodo,
+  onRecipeClick,
   onWeatherClick,
   onEventClick,
   members = [],
@@ -121,6 +123,7 @@ export function DashboardView({
     timeFormat,
     events,
     weather,
+    onRecipeClick,
     onWeatherClick,
     onEventClick,
     members,

@@ -25,6 +25,7 @@ export const en = {
   'common.start': 'Start',
 
   // ---- nav (Sidebar) ----
+  'nav.recipes': 'Recipes',
   'nav.dashboard': 'Dashboard',
   'nav.calendar': 'Calendar',
   'nav.chores': 'Chores',

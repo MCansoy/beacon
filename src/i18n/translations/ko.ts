@@ -20,6 +20,7 @@ export const ko: Record<TranslationKey, string> = {
   'common.start': '시작',
 
   // ---- nav (Sidebar) ----
+  'nav.recipes': '레시피',
   'nav.dashboard': '대시보드',
   'nav.calendar': '캘린더',
   'nav.chores': '집안일',

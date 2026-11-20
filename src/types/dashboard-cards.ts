@@ -60,6 +60,7 @@ export interface DashboardCardContext {
   timeFormat: '12h' | '24h';
   events: CalendarEvent[];
   weather: WeatherData | null;
+  onRecipeClick?: (id: string) => void;
   onWeatherClick?: () => void;
   onEventClick?: (event: CalendarEvent) => void;
   members: FamilyMember[];

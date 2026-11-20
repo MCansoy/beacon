@@ -20,6 +20,7 @@ export const it: Record<TranslationKey, string> = {
   'common.start': 'Avvia',
 
   // ---- nav (Sidebar) ----
+  'nav.recipes': 'Ricette',
   'nav.dashboard': 'Bacheca',
   'nav.calendar': 'Calendario',
   'nav.chores': 'Faccende',

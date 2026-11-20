@@ -20,6 +20,7 @@ export const ja: Record<TranslationKey, string> = {
   'common.start': '開始',
 
   // ---- nav (Sidebar) ----
+  'nav.recipes': 'レシピ',
   'nav.dashboard': 'ダッシュボード',
   'nav.calendar': 'カレンダー',
   'nav.chores': '家事',

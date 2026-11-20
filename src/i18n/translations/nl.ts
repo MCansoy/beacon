@@ -20,6 +20,7 @@ export const nl: Record<TranslationKey, string> = {
   'common.start': 'Starten',
 
   // ---- nav (Sidebar) ----
+  'nav.recipes': 'Recepten',
   'nav.dashboard': 'Dashboard',
   'nav.calendar': 'Agenda',
   'nav.chores': 'Klusjes',
