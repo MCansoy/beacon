@@ -3,38 +3,44 @@
   min-width: 0;
   color: var(--text-primary);
 }
-.clock-forecast-card > .dash-topbar { margin-bottom: 16px; }
+.clock-forecast-current > .dash-topbar { margin-bottom: 8px; }
+.clock-forecast-current .dash-topbar-left { width: 100%; gap: 4px; }
+.clock-forecast-current .dash-topbar-time { font-size: 30px; }
+.clock-forecast-current .dash-topbar-date-nav { width: 100%; gap: 4px; }
+.clock-forecast-current .dash-topbar-date { font-size: clamp(18px, 2cqi, 24px); font-weight: 600; min-height: 28px; }
+.clock-forecast-current .dash-day-nav-btn { width: 28px; height: 28px; }
+.clock-forecast-current .dash-day-nav-today { padding: 4px 6px; font-size: 12px; }
 .clock-forecast-panel {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 28px;
-  padding: 24px;
+  gap: 20px;
+  padding: 10px 16px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg, 20px);
 }
-.clock-forecast-location { font-size: 20px; font-weight: 600; overflow-wrap: anywhere; }
-.clock-forecast-caption { margin-top: 4px; font-size: 12px; color: var(--text-muted); }
-.clock-forecast-reading { display: flex; align-items: center; gap: 16px; margin: 12px 0 4px; }
-.clock-forecast-icon { font-size: 56px; line-height: 1; }
-.clock-forecast-temperature { font-family: var(--font-display); font-size: 64px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.clock-forecast-temperature small { font-size: 24px; color: var(--text-secondary); }
-.clock-forecast-condition { font-size: 18px; }
-.clock-forecast-details { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 20px 0 0; }
+.clock-forecast-location { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.clock-forecast-caption { display: none; }
+.clock-forecast-reading { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; }
+.clock-forecast-icon { font-size: 34px; line-height: 1; }
+.clock-forecast-temperature { font-family: var(--font-display); font-size: 38px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.clock-forecast-temperature small { font-size: 18px; color: var(--text-secondary); }
+.clock-forecast-condition { font-size: 14px; }
+.clock-forecast-details { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 8px 0 0; }
 .clock-forecast-details dt { font-size: 12px; color: var(--text-muted); }
-.clock-forecast-details dd { margin: 4px 0 0; font-size: 16px; }
+.clock-forecast-details dd { margin: 2px 0 0; font-size: 13px; }
 .clock-forecast-days { min-width: 0; }
-.clock-forecast-days h3 { margin: 0 0 12px; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
-.clock-forecast-day { display: grid; grid-template-columns: 4.5em 28px 2.5em minmax(20px, 1fr) 2.5em; align-items: center; gap: 10px; padding: 8px 0; }
+.clock-forecast-days h3 { margin: 0 0 6px; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+.clock-forecast-day { display: grid; grid-template-columns: 4.5em 28px 2.5em minmax(20px, 1fr) 2.5em; align-items: center; gap: 10px; padding: 3px 0; }
 .clock-forecast-day-name strong { display: block; font-size: 14px; }
 .clock-forecast-day-name small { display: block; font-size: 11px; color: var(--text-muted); }
-.clock-forecast-day-icon { font-size: 24px; text-align: center; }
+.clock-forecast-day-icon { font-size: 18px; text-align: center; }
 .clock-forecast-low, .clock-forecast-high { text-align: right; font-variant-numeric: tabular-nums; }
 .clock-forecast-low { color: var(--text-muted); }
 .clock-forecast-range { position: relative; height: 7px; background: var(--bg-hover); border-radius: 8px; overflow: hidden; }
 .clock-forecast-range > span { position: absolute; top: 0; bottom: 0; border-radius: inherit; background: linear-gradient(90deg, #60a5fa, #f59e0b); }
 @container (max-width: 600px) {
-  .clock-forecast-panel { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 18px; }
+  .clock-forecast-panel { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 12px; }
   .clock-forecast-day { gap: 6px; grid-template-columns: 4em 24px 2.2em minmax(12px, 1fr) 2.2em; }
-  .clock-forecast-temperature { font-size: 52px; }
+  .clock-forecast-temperature { font-size: 38px; }
 }

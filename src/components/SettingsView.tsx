@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { SIDEBAR_PAGES } from './Sidebar';
 import { useTheme } from '../hooks/useTheme';
 import {
   Settings as SettingsIcon,
@@ -89,15 +90,18 @@ function Toggle({
   checked,
   onChange,
   disabled = false,
+  label,
 }: {
   checked: boolean;
   onChange: (v: boolean) => void;
   disabled?: boolean;
+  label?: string;
 }) {
   return (
     <label className="settings-toggle">
       <input
         type="checkbox"
+        aria-label={label}
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
@@ -1534,6 +1538,21 @@ export function SettingsView({
     <>
       <h2 className="settings-section-title">{t('settings.display.title')}</h2>
       <p className="settings-section-desc">{t('settings.display.desc')}</p>
+      <div className="settings-group">
+        <div className="settings-group-title">Sidebar pages</div>
+        <p className="settings-section-desc">Choose which pages appear in Beacon?s sidebar and mobile menu. Hiding a page does not delete its data. Settings always remains available.</p>
+        {SIDEBAR_PAGES.map(page => (
+          <div className="settings-row" key={page.id}>
+            <div className="settings-row-label">{t(page.labelKey)}</div>
+            <Toggle label={t(page.labelKey)}
+              checked={!(settings.hiddenSidebarPages ?? []).includes(page.id)}
+              onChange={visible => onUpdateSettings({ hiddenSidebarPages: visible
+                ? (settings.hiddenSidebarPages ?? []).filter(id => id !== page.id)
+                : [...new Set([...(settings.hiddenSidebarPages ?? []), page.id])] })} />
+          </div>
+        ))}
+        <button type="button" className="btn btn--secondary" onClick={() => onUpdateSettings({ hiddenSidebarPages: [] })}>Show all pages</button>
+      </div>
 
       <div className="settings-group">
         <div className="settings-row">

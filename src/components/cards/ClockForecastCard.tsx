@@ -24,9 +24,9 @@ export function ClockForecastCard({ config, context }: DashboardCardProps) {
 
   return (
     <section className="clock-forecast-card" aria-label={t('cards.clockForecast.displayName')}>
-      <ClockWeatherCard config={{}} context={{ ...context, weather: null }} />
       <div className="clock-forecast-panel">
         <div className="clock-forecast-current">
+          <ClockWeatherCard config={{}} context={{ ...context, weather: null }} />
           <div className="clock-forecast-location">{title}</div>
           <div className="clock-forecast-caption">{t('cards.clockForecast.current')}</div>
           {loading ? <p role="status">{t('weatherView.loading')}</p> : failed ? (

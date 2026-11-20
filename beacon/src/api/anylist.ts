@@ -114,6 +114,7 @@ export class AnyListClient {
       });
     } catch (err) {
       console.warn('Beacon: Failed to check item', err);
+      throw err;
     }
   }
 
@@ -126,6 +127,7 @@ export class AnyListClient {
       });
     } catch (err) {
       console.warn('Beacon: Failed to uncheck item', err);
+      throw err;
     }
   }
 

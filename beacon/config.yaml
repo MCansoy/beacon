@@ -1,8 +1,8 @@
 name: Beacon
-version: "1.40.0"
+version: "1.40.0-fork.1"
 slug: beacon
-description: "Family command center for wall-mounted displays"
-url: "https://github.com/asachs01/beacon"
+description: "Personal Beacon fork with calendar, media, recipes and dashboard improvements"
+url: "https://github.com/MCansoy/beacon"
 arch:
   - amd64
   - aarch64
@@ -12,7 +12,7 @@ startup: application
 boot: auto
 ingress: true
 ingress_port: 3000
-panel_icon: mdi:calendar-clock
+panel_icon: mdi:lighthouse
 panel_title: Beacon
 homeassistant_api: true
 auth_api: true

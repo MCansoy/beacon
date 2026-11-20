@@ -116,7 +116,7 @@ export function ShoppingCard({ config }: DashboardCardProps) {
       <h3 className="dash-sidebar-heading">{t('dashboard.shopping')}</h3>
 
       {/* Quick-add input */}
-      <form className="dash-shopping-add" onSubmit={handleAdd} style={{ marginBottom: 12 }}>
+      <form className="dash-shopping-add" onSubmit={handleAdd} style={{ display: 'flex', alignItems: 'stretch', gap: 6, padding: 4, marginBottom: 12 }}>
         <input
           ref={inputRef}
           type="text"
@@ -127,6 +127,7 @@ export function ShoppingCard({ config }: DashboardCardProps) {
           disabled={submitting}
           style={{
             flex: 1,
+            minWidth: 0,
             padding: '6px 10px',
             fontSize: '0.85rem',
             border: '1px solid var(--border)',
@@ -142,6 +143,7 @@ export function ShoppingCard({ config }: DashboardCardProps) {
           aria-label={t('dashboard.shoppingAddItem')}
           style={{
             padding: '6px 10px',
+            flexShrink: 0,
             border: 'none',
             borderRadius: 6,
             background: inputValue.trim() ? 'var(--accent)' : 'var(--border)',
@@ -166,7 +168,7 @@ export function ShoppingCard({ config }: DashboardCardProps) {
           {t('dashboard.shoppingEmpty')}
         </div>
       ) : (
-        <ul className="task-checklist">
+        <ul className="task-checklist dash-shopping-items">
           {uncheckedItems.map((item) => (
             <li key={item.uid} className="task-checklist-item">
               <button

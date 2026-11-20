@@ -47,6 +47,7 @@ export interface BeaconSettings {
   advancedDashboard: boolean;
 
   // Display
+  hiddenSidebarPages: string[];
   screenSaverEnabled: boolean;
   dimTimeout: number;       // minutes
   screenSaverTimeout: number; // minutes
@@ -106,6 +107,7 @@ function buildDefaults(): BeaconSettings {
     dashboardLayout: 'default',
     advancedDashboard: false,
 
+    hiddenSidebarPages: [],
     screenSaverEnabled: true,
     dimTimeout: 5,
     screenSaverTimeout: config.screen_saver_timeout,

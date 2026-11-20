@@ -28,6 +28,8 @@ interface DashboardViewProps {
   completedChoreIds: Set<string>;
   onToggleChore: (choreId: string) => void;
   todoItems?: TodoItem[];
+  onAddTask?: (name: string) => void | Promise<void>;
+  onQuickAddChore?: (name: string) => void | Promise<void>;
   onToggleTodo?: (uid: string, currentStatus: string, listId?: string) => void;
   onRecipeClick?: (id: string) => void;
   onWeatherClick?: () => void;
@@ -56,6 +58,8 @@ export function DashboardView({
   onToggleChore,
   todoItems = [],
   onToggleTodo,
+  onAddTask,
+  onQuickAddChore,
   onRecipeClick,
   onWeatherClick,
   onEventClick,
@@ -141,6 +145,8 @@ export function DashboardView({
     todaysMenu,
     todoItems,
     onToggleTodo,
+  onAddTask,
+  onQuickAddChore,
     taskmateUsers,
     filteredChores,
     completedChoreIds,

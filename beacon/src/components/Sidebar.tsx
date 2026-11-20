@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  BookOpen,
+  CookingPot,
   LayoutDashboard,
   Calendar,
   ListChecks,
@@ -15,7 +15,6 @@ import {
   MoreHorizontal,
   X,
 } from 'lucide-react';
-import beaconIcon from '../assets/beacon-app-icon.svg';
 import { useTranslation, type TranslationKey } from '../i18n';
 
 export type SidebarView = 'dashboard' | 'calendar' | 'chores' | 'grocery' | 'tasks' | 'leaderboard' | 'music' | 'photos' | 'timer' | 'weather' | 'settings' | 'recipes';
@@ -24,6 +23,7 @@ interface SidebarProps {
   activeView: SidebarView;
   onChangeView: (view: SidebarView) => void;
   position?: 'left' | 'right' | 'bottom';
+  hiddenPages?: string[];
 }
 
 const ICON_SIZE = 24;
@@ -35,12 +35,12 @@ interface NavItem {
   labelKey: TranslationKey;
 }
 
-const NAV_ITEMS: NavItem[] = [
+export const SIDEBAR_PAGES: NavItem[] = [
   { id: 'dashboard', icon: <LayoutDashboard size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.dashboard' },
   { id: 'calendar', icon: <Calendar size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.calendar' },
   { id: 'chores', icon: <ListChecks size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.chores' },
   { id: 'grocery', icon: <ShoppingCart size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.grocery' },
-  { id: 'recipes', icon: <BookOpen size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.recipes' },
+  { id: 'recipes', icon: <CookingPot size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.recipes' },
   { id: 'tasks', icon: <ClipboardList size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.tasks' },
   { id: 'leaderboard', icon: <Trophy size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.leaderboard' },
   { id: 'music', icon: <Music size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />, labelKey: 'nav.music' },
@@ -56,12 +56,14 @@ export function Sidebar({
   activeView,
   onChangeView,
   position = 'left',
+  hiddenPages = [],
 }: SidebarProps) {
   const { t } = useTranslation();
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
 
-  const mobileTabItems = NAV_ITEMS.filter((item) => MOBILE_TAB_IDS.includes(item.id));
-  const mobileOverflowItems = NAV_ITEMS.filter((item) => !MOBILE_TAB_IDS.includes(item.id));
+  const visibleItems = SIDEBAR_PAGES.filter(item => !hiddenPages.includes(item.id));
+  const mobileTabItems = visibleItems.filter((item) => MOBILE_TAB_IDS.includes(item.id));
+  const mobileOverflowItems = visibleItems.filter((item) => !MOBILE_TAB_IDS.includes(item.id));
 
   const handleMobileNav = (view: SidebarView) => {
     onChangeView(view);
@@ -78,12 +80,12 @@ export function Sidebar({
       >
         {/* Beacon logo */}
         <div className="sidebar-logo">
-          <img src={beaconIcon} alt="Beacon" width={32} height={32} />
+          <svg viewBox="0 0 24 24" width={32} height={32} fill="currentColor" role="img" aria-label="Beacon" style={{ color: 'var(--accent)' }}><title>Beacon</title><path d="M8,10V8H9V4H8V3L12,1L16,3V4H15V8H16V10H14.74L8.44,13.64L9,10H8M13,8V4H11V8H13M7,23L7.04,22.76L16.15,17.5L16.67,20.88L13,23H7M8.05,16.17L15.31,12L15.83,15.37L7.43,20.22L8.05,16.17Z" /></svg>
         </div>
 
         {/* Main nav icons */}
         <div className="sidebar-nav-group">
-          {NAV_ITEMS.map((item) => (
+          {visibleItems.map((item) => (
             <button
               key={item.id}
               type="button"

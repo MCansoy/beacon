@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { BookOpen, Upload, ArrowLeft, Search } from 'lucide-react';
+import { CookingPot, Upload, ArrowLeft, Search } from 'lucide-react';
 import { recipeRequest, recipeUrl, type Recipe, type RecipeSummary, type ImportPreview } from '../api/recipes';
 import '../styles/recipes.css';
 
@@ -70,7 +70,7 @@ export function RecipesView({ initialRecipeId }: { initialRecipeId?: string | nu
   const sourceUrl = detail && /^https?:\/\//i.test(detail.source_url) ? detail.source_url : null;
   return <main className="recipes-view">
     <header className="recipes-header">
-      <div><p className="recipes-eyebrow">Your family cookbook</p><h1><BookOpen aria-hidden="true" /> Recipes</h1><p>{recipes.length} recipes · Imported from Paprika</p></div>
+      <div><p className="recipes-eyebrow">Your family cookbook</p><h1><CookingPot aria-hidden="true" /> Recipes</h1><p>{recipes.length} recipes · Imported from Paprika</p></div>
       <button className="recipes-primary" disabled={busy || loading} onClick={() => fileInput.current?.click()}><Upload size={18} />{busy ? 'Working…' : 'Import recipes'}</button>
       <input ref={fileInput} hidden type="file" accept=".paprikarecipes" onChange={e => { const f=e.target.files?.[0]; e.target.value=''; if(f) void inspect(f); }} />
     </header>
@@ -110,9 +110,9 @@ export function RecipesView({ initialRecipeId }: { initialRecipeId?: string | nu
       <div className="recipes-filters"><label><Search size={18} /><input aria-label="Search recipes" placeholder="Search recipes or categories" value={query} onChange={e => setQuery(e.target.value)} /></label>
         <select aria-label="Recipe category" value={category} onChange={e => setCategory(e.target.value)}><option value="">All categories</option>{categories.map(c => <option key={c}>{c}</option>)}</select>
       </div>
-      {loading ? <p role="status">Loading recipes…</p> : !recipes.length ? <section className="recipes-empty"><BookOpen size={48} /><h2>Your cookbook starts here</h2><p>In Paprika, open Settings → Export and choose Paprika format. Then use Import recipes above.</p></section> : !visible.length ? <p>No recipes match these filters.</p> :
+      {loading ? <p role="status">Loading recipes…</p> : !recipes.length ? <section className="recipes-empty"><CookingPot size={48} /><h2>Your cookbook starts here</h2><p>In Paprika, open Settings → Export and choose Paprika format. Then use Import recipes above.</p></section> : !visible.length ? <p>No recipes match these filters.</p> :
         <div className="recipes-grid">{visible.map(r => <button key={r.uid} className="recipe-card" onClick={() => { setSelected(r.uid); setError(''); }}>
-          {r.has_photo ? <img loading="lazy" src={recipeUrl(`/${encodeURIComponent(r.uid)}/photo`)} alt="" /> : <div className="recipe-placeholder"><BookOpen size={40} /></div>}
+          {r.has_photo ? <img loading="lazy" src={recipeUrl(`/${encodeURIComponent(r.uid)}/photo`)} alt="" /> : <div className="recipe-placeholder"><CookingPot size={40} /></div>}
           <div><span className="recipe-card-category">{r.categories.slice(0,2).join(' · ')}</span><h2>{r.name}</h2><span>{r.total_time || r.cook_time || r.prep_time}</span></div>
         </button>)}</div>}
     </>}

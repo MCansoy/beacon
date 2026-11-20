@@ -1200,3 +1200,20 @@
   cursor: pointer;
 }
 
+
+/* Shared compact rows for dashboard shopping, tasks, and chore checklists. */
+:is(.dash-shopping-items, .dash-compact-tasks .task-checklist) { gap: 2px; }
+:is(.dash-shopping-items, .dash-compact-tasks) .task-checklist-item { min-height: 32px; padding: 2px 4px; gap: 6px; }
+:is(.dash-shopping-items, .dash-compact-tasks) .task-checkbox { width: 28px; height: 28px; }
+:is(.dash-shopping-items, .dash-compact-tasks) .task-checkbox-box { width: 18px; height: 18px; border-radius: 4px; }
+:is(.dash-shopping-items, .dash-compact-tasks) .task-checklist-label { font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+
+.dash-compact-tasks .task-checklist-label { gap: 6px; }
+.dash-compact-tasks .task-checklist-icon { font-size: 14px; }
+.dash-compact-tasks .task-checklist-avatar { width: 18px; height: 18px; }
+.dash-compact-tasks .task-checklist-assignee { padding: 1px 6px 1px 1px; }
+
+.dash-quick-add { display: flex; align-items: stretch; gap: 6px; padding: 4px; margin-bottom: 4px; }
+.dash-quick-add input { flex: 1; min-width: 0; padding: 6px 10px; font-size: .85rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-surface); color: var(--text-primary); }
+.dash-quick-add button { flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 6px 10px; border: none; border-radius: 6px; background: var(--accent); color: white; cursor: pointer; }
+.dash-quick-add button:disabled { background: var(--border); cursor: not-allowed; }

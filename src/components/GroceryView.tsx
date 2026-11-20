@@ -17,6 +17,7 @@ interface UnifiedList {
   id: string;
   name: string;
   source: 'ha' | 'local';
+  beaconShopping?: boolean;
 }
 
 /** Keywords that identify a list as grocery/shopping (vs tasks) */
@@ -34,13 +35,14 @@ export type ListViewMode = 'grocery' | 'tasks';
 
 interface GroceryViewProps {
   defaultListId?: string;
+  shoppingEntity?: string;
   /** Which lists to show: 'grocery' for shopping lists, 'tasks' for everything else */
   mode?: ListViewMode;
   /** Explicit list of HA todo entity IDs that are grocery/shopping lists */
   groceryListIds?: string[];
 }
 
-export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = [] }: GroceryViewProps) {
+export function GroceryView({ defaultListId, shoppingEntity, mode = 'grocery', groceryListIds = [] }: GroceryViewProps) {
   const { t } = useTranslation();
   const [haLists, setHaLists] = useState<GroceryList[]>([]);
   const [selectedListId, setSelectedListId] = useState<string>(defaultListId || '');
@@ -48,17 +50,33 @@ export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = 
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [clearError, setClearError] = useState('');
+  const clearPending = useRef(false);
   const [completedCollapsed, setCompletedCollapsed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const anylistRef = useRef(new AnyListClient());
 
   const localTasks = useLocalTasks();
 
+  // Present the primary HA shopping list as Beacon's single Shopping List.
+  const linkedShoppingId = shoppingEntity?.startsWith('todo.') ? shoppingEntity
+    : defaultListId?.startsWith('todo.') ? defaultListId
+    : haLists.find(list => list.id === 'todo.shopping_list')?.id;
+
   // Merge HA lists + local lists, then filter by mode
   const allLists = useMemo<UnifiedList[]>(() => {
-    const ha: UnifiedList[] = haLists.map(l => ({ id: l.id, name: l.name, source: 'ha' }));
+    const ha: UnifiedList[] = haLists.map(l => ({
+      id: l.id, name: l.id === linkedShoppingId ? 'Shopping List' : l.name,
+      source: 'ha', beaconShopping: l.id === linkedShoppingId,
+    }));
+    // Keep a configured linked list selected even if HA discovery fails;
+    // never silently switch writes to a different, local list.
+    if (linkedShoppingId && !ha.some(l => l.id === linkedShoppingId)) {
+      ha.unshift({ id: linkedShoppingId, name: 'Shopping List', source: 'ha', beaconShopping: true });
+    }
     const local: UnifiedList[] = localTasks.lists.map(l => ({ id: l.id, name: l.name, source: 'local' }));
-    const merged = [...local, ...ha];
+    const merged = [...ha.filter(l => l.beaconShopping), ...local.filter(l => !linkedShoppingId || l.id !== 'beacon-shopping'), ...ha.filter(l => !l.beaconShopping)];
 
     // Determine if an HA list is a grocery list:
     // - If groceryListIds is configured (non-empty), use it as source of truth
@@ -73,16 +91,16 @@ export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = 
     // Filter by mode: grocery lists vs task lists
     if (mode === 'grocery') {
       return merged.filter(l =>
-        l.id === 'beacon-shopping' ||
+        l.beaconShopping || l.id === 'beacon-shopping' ||
         (defaultListId != null && defaultListId !== '' && l.id === defaultListId) ||
         (l.source === 'ha' && isGroceryHA(l.id, l.name))
       );
     }
     // tasks mode: local To-Do + all HA lists that aren't grocery
     return merged.filter(l =>
-      l.id === 'beacon-todo' || (l.source === 'ha' && !isGroceryHA(l.id, l.name))
+      l.id === 'beacon-todo' || (l.source === 'ha' && !l.beaconShopping && !isGroceryHA(l.id, l.name))
     );
-  }, [haLists, localTasks.lists, mode, defaultListId, groceryListIds]);
+  }, [haLists, localTasks.lists, mode, defaultListId, groceryListIds, linkedShoppingId]);
 
   const selectedList = allLists.find(l => l.id === selectedListId);
   const isLocal = selectedList?.source === 'local';
@@ -127,12 +145,13 @@ export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = 
   // Auto-select first list when lists are available
   useEffect(() => {
     if (selectedListId && allLists.some(l => l.id === selectedListId)) return;
+    if (loading) return;
     if (defaultListId && allLists.some(l => l.id === defaultListId)) {
       setSelectedListId(defaultListId);
     } else if (allLists.length > 0) {
       setSelectedListId(allLists[0].id);
     }
-  }, [allLists, selectedListId, defaultListId]);
+  }, [allLists, selectedListId, defaultListId, loading]);
 
   // Load HA items via todo.get_items
   const loadHaItems = useCallback(async (entityId: string) => {
@@ -182,6 +201,21 @@ export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = 
     [items],
   );
 
+  const handleClearChecked = async () => {
+    if (!selectedListId || !checkedItems.length || clearPending.current) return;
+    clearPending.current = true;
+    setClearing(true); setClearError('');
+    try {
+      if (isLocal) localTasks.clearCompleted(selectedListId);
+      else {
+        await callHaService('todo', 'remove_completed_items', { entity_id: selectedListId });
+        setHaItems(prev => prev.filter(item => item.status !== 'completed'));
+        await loadHaItems(selectedListId);
+      }
+    } catch { setClearError('Could not clear checked items. Please try again.'); }
+    finally { clearPending.current = false; setClearing(false); }
+  };
+
   // Add item
   const handleAdd = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,6 +242,7 @@ export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = 
 
   // Toggle item
   const handleToggle = useCallback(async (item: TodoItem) => {
+    if (clearPending.current) return;
     if (isLocal) {
       localTasks.toggleTask(item.uid);
       return;
@@ -247,15 +282,16 @@ export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = 
         <div className="grocery-view-selector">
           <select
             className="grocery-view-select"
+            disabled={clearing}
             value={selectedListId}
-            onChange={(e) => setSelectedListId(e.target.value)}
+            onChange={(e) => { setSelectedListId(e.target.value); setClearError(''); }}
           >
             {allLists.length === 0 && (
               <option value="">{t('grocery.noListsAvailable')}</option>
             )}
             {allLists.map(list => (
               <option key={list.id} value={list.id}>
-                {list.source === 'ha' ? t('grocery.haList', { name: list.name }) : list.name}
+                {list.source === 'ha' && !list.beaconShopping ? t('grocery.haList', { name: list.name }) : list.name}
               </option>
             ))}
           </select>
@@ -263,6 +299,13 @@ export function GroceryView({ defaultListId, mode = 'grocery', groceryListIds = 
         </div>
       </div>
 
+      {mode === 'grocery' && <div className="grocery-clear-actions">
+        <button type="button" className="btn btn--secondary" onClick={handleClearChecked}
+          disabled={clearing || loading || submitting || !checkedItems.length}>
+          <Trash2 size={16} aria-hidden="true" /> {clearing ? 'Clearing?' : 'Clear checked'}
+        </button>
+        {clearError && <p role="alert">{clearError}</p>}
+      </div>}
       {/* Quick-add input */}
       <form className="grocery-view-add" onSubmit={handleAdd}>
         <input

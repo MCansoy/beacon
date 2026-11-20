@@ -130,6 +130,7 @@ export function App() {
   const {
     chores,
     completionsToday,
+    addChore,
     completeChore,
     uncompleteChore,
   } = useChores();
@@ -592,6 +593,7 @@ export function App() {
           activeView={activeView}
           onChangeView={(view) => { if (view === 'recipes') setRecipeId(null); handleChangeView(view); }}
           position={sidebarPos}
+          hiddenPages={settings.hiddenSidebarPages}
         />
       )}
 
@@ -607,6 +609,8 @@ export function App() {
               onToggleChore={handleToggleChore}
               todoItems={dashboardTasks.items}
               onToggleTodo={dashboardTasks.toggleItem}
+              onAddTask={dashboardTasks.addItem}
+              onQuickAddChore={settings.choresEnabled ? async (name) => { await addChore({ name, assigned_to: [], frequency: 'once', value_cents: 0 }); } : undefined}
               onWeatherClick={() => setActiveView('weather')}
               onRecipeClick={(id) => { setRecipeId(id); setActiveView('recipes'); }}
               onEventClick={handleEventClick}
@@ -666,9 +670,9 @@ export function App() {
         ) : activeView === 'recipes' ? (
           <RecipesView initialRecipeId={recipeId} />
         ) : activeView === 'grocery' ? (
-          <GroceryView defaultListId={settings.defaultGroceryList || undefined} mode="grocery" groceryListIds={settings.groceryListIds} />
+          <GroceryView shoppingEntity={settings.shoppingEntity || undefined} defaultListId={settings.defaultGroceryList || undefined} mode="grocery" groceryListIds={settings.groceryListIds} />
         ) : activeView === 'tasks' ? (
-          <GroceryView mode="tasks" groceryListIds={settings.groceryListIds} />
+          <GroceryView shoppingEntity={settings.shoppingEntity || undefined} mode="tasks" groceryListIds={settings.groceryListIds} />
         ) : activeView === 'timer' ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', padding: 24 }}>
             <Timer />

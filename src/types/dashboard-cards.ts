@@ -78,6 +78,8 @@ export interface DashboardCardContext {
   weekEvents: { day: Date; events: CalendarEvent[] }[];
   todaysMenu: DayMenu;
   todoItems: TodoItem[];
+  onAddTask?: (name: string) => void | Promise<void>;
+  onQuickAddChore?: (name: string) => void | Promise<void>;
   onToggleTodo?: (uid: string, currentStatus: string, listId?: string) => void;
   taskmateUsers: TaskmateUser[];
   filteredChores: Chore[];

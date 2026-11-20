@@ -1,19 +1,24 @@
 import { DashboardCardProps, TodoItem } from '../../types/dashboard-cards';
 import { TaskChecklist } from '../TaskChecklist';
+import { QuickAddItem } from './QuickAddItem';
 import { MEMBER_COLORS } from '../../types/family';
 import type { TaskmateUser } from '../../types/taskmate';
 import { useTranslation } from '../../i18n';
 
-/** Sidebar "Tasks" section — HA todo items (optionally grouped by TaskMate user), or chores checklist fallback. */
-export function TasksCard({ context }: DashboardCardProps) {
+/** Sidebar "Tasks" section — HA todo items (optionally grouped by TaskMate user), or a dedicated chores checklist. */
+export function TasksCard({ context, config }: DashboardCardProps) {
   const { t } = useTranslation();
   const { todoItems, onToggleTodo, taskmateUsers, filteredChores, completedChoreIds, onToggleChore, members } = context;
 
+  const choresMode = config.mode === 'chores';
+  const add = choresMode ? context.onQuickAddChore : context.onAddTask;
   return (
-    <section className="dash-sidebar-section">
-      <h3 className="dash-sidebar-heading">{t('dashboard.tasks')}</h3>
-      {todoItems.length > 0 ? (
-        <TaskGroups items={todoItems} users={taskmateUsers} onToggleTodo={onToggleTodo} />
+    <section className="dash-sidebar-section dash-compact-tasks">
+      <h3 className="dash-sidebar-heading">{choresMode ? t('nav.chores') : t('dashboard.tasks')}</h3>
+      {add && <QuickAddItem onAdd={add} label={choresMode ? 'Add chore' : 'Add task'}
+        hint={choresMode ? 'One-time chore ? assign in Chores' : 'Adds to Beacon To-Do'} />}
+      {!choresMode ? (
+        <TaskGroups items={todoItems.filter(item => item.status === 'needs_action')} users={taskmateUsers} onToggleTodo={onToggleTodo} />
       ) : (
         <TaskChecklist
           chores={filteredChores}

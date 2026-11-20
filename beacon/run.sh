@@ -16,20 +16,22 @@ SCREEN_SAVER_TIMEOUT="$(bashio::config 'screen_saver_timeout' 2>/dev/null || ech
 if [ -n "${HA_TOKEN}" ]; then
   bashio::log.info "HA token configured (user-provided)."
 elif [ -n "${SUPERVISOR_TOKEN:-}" ]; then
-  bashio::log.info "No user token — using API proxy with Supervisor token."
+  bashio::log.info "No user token â€” using API proxy with Supervisor token."
 else
   bashio::log.warning "No HA token and no Supervisor token. Calendar/list integrations will not work."
 fi
 
-# The proxy server handles /api/* requests — the browser always uses same-origin.
+# The proxy server handles /api/* requests â€” the browser always uses same-origin.
 # ha_url stays empty so the frontend uses window.location.origin (the proxy).
-# ha_token is cleared in the runtime config — the proxy injects auth server-side.
+# ha_token is cleared in the runtime config â€” the proxy injects auth server-side.
 # This means zero config needed from the user for HA connectivity.
 HA_URL=""
 HA_BROWSER_TOKEN=""
 
 # Generate runtime-config.js using node for proper JSON escaping (prevents injection)
 CONFIG_JS="/app/dist/runtime-config.js"
+export HA_URL HA_BROWSER_TOKEN FAMILY_NAME SAVE_CONFIG_IN_BROWSER THEME AUTO_DARK_MODE
+export WEATHER_ENTITY PHOTO_DIRECTORY PHOTO_INTERVAL SCREEN_SAVER_TIMEOUT
 node -e "
   const config = {
     ha_url: process.env.HA_URL || '',
@@ -47,11 +49,7 @@ node -e "
     '${CONFIG_JS}',
     'window.__BEACON_CONFIG__ = ' + JSON.stringify(config) + ';'
   );
-" HA_URL="${HA_URL}" HA_BROWSER_TOKEN="${HA_BROWSER_TOKEN}" FAMILY_NAME="${FAMILY_NAME}" \
-  SAVE_CONFIG_IN_BROWSER="${SAVE_CONFIG_IN_BROWSER}" \
-  THEME="${THEME}" AUTO_DARK_MODE="${AUTO_DARK_MODE}" WEATHER_ENTITY="${WEATHER_ENTITY}" \
-  PHOTO_DIRECTORY="${PHOTO_DIRECTORY}" PHOTO_INTERVAL="${PHOTO_INTERVAL}" \
-  SCREEN_SAVER_TIMEOUT="${SCREEN_SAVER_TIMEOUT}"
+"
 
 # Inject the runtime-config script tag into index.html if not already present
 INDEX_HTML="/app/dist/index.html"

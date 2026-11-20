@@ -130,7 +130,12 @@ export function useDashboardTasks(connected: boolean, groceryListIds: string[] =
     }
   }, [localTasks, haItems]);
 
-  return { items, toggleItem, users };
+  const addItem = useCallback((name: string) => {
+    const trimmed = name.trim();
+    if (trimmed) localTasks.addTask('beacon-todo', trimmed);
+  }, [localTasks.addTask]);
+
+  return { items, toggleItem, users, addItem };
 }
 
 const GROCERY_KEYWORDS = [

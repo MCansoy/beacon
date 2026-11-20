@@ -96,6 +96,10 @@ export function useLocalTasks() {
     ));
   }, []);
 
+  const clearCompleted = useCallback((listId: string) => {
+    setTasks(prev => prev.filter(t => t.listId !== listId || t.status !== 'completed'));
+  }, []);
+
   const removeTask = useCallback((taskId: string) => {
     setTasks(prev => prev.filter(t => t.id !== taskId));
   }, []);
@@ -121,6 +125,7 @@ export function useLocalTasks() {
     addTask,
     toggleTask,
     removeTask,
+    clearCompleted,
     addList,
     removeList,
     refresh,
