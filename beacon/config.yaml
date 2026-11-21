@@ -1,5 +1,5 @@
 name: Beacon
-version: "1.40.0-fork.1"
+version: "1.40.0-fork.2"
 slug: beacon
 description: "Personal Beacon fork with calendar, media, recipes and dashboard improvements"
 url: "https://github.com/MCansoy/beacon"
@@ -14,6 +14,7 @@ ingress: true
 ingress_port: 3000
 panel_icon: mdi:lighthouse
 panel_title: Beacon
+panel_admin: false
 homeassistant_api: true
 auth_api: true
 options:
